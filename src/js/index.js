@@ -13,17 +13,25 @@ const refs = {
 refs.input.addEventListener("input", debounce(onInput, 500));
 
 function onInput(e) {
-  // refs.template.innerHTML = "";
+  refs.template.innerHTML = "";
 
   const searchQuery = refs.input.value;
+
+  if (searchQuery === "") {
+    error("Please enter the name of the country");
+    return;
+  }
 
   fetchCountries(searchQuery).then(onSuccess);
 }
 
 function onSuccess(data) {
-  console.log(data.length);
+  if (data.status === 404) {
+    error("No results were found for your search! Please enter correct data!");
+    return;
+  }
 
-  if (data.length >= 10) {
+  if (data.length >= 10 || data.length === 0) {
     refs.template.innerHTML = "";
 
     error("Too many matches found. Please enter a more specific query!");
@@ -31,18 +39,16 @@ function onSuccess(data) {
     return;
   } else if (data.length === 1) {
     renderCards(data);
+    return;
   } else {
     renderList(data);
   }
 }
 
 function renderList(data) {
-  console.log(data);
-  console.log(listNamesTpl(data));
   refs.template.innerHTML = listNamesTpl(data);
 }
 
 function renderCards(data) {
-  console.log(cardCountryTpl);
   refs.template.innerHTML = cardCountryTpl(data);
 }
